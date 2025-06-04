@@ -62,7 +62,7 @@ class Riwayat(models.Model):
 class Laporan(models.Model):
     babi = models.ForeignKey(Babi, on_delete=models.CASCADE, null=True, blank=True)
     tanggal = models.DateTimeField(null=True, blank=True)
-    berat_badan = models.IntegerField()
+    berat_badan = models.CharField(max_length=10, null=True, blank=True)
     obat = models.BooleanField(default=False)
 
     def __str__(self):

@@ -26,7 +26,7 @@
                                 <select class="form-select select2" name="babi" id="babi" multiple="multiple" style="width: 100%;">
                                     {% if all_babis %}
                                         {% for babi in all_babis %}
-                                        <option value="{{ babi.pk }}">{{ babi }}</option>
+                                        <option value="{{ babi.pk }}">{{ babi }} - {{ babi.laporan.berat_badan }}</option>
                                         {% endfor %}
                                     {% endif %}
                                 </select>

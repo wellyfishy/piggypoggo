@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('tanya-ai/', views.tanya_ai, name='tanya_ai'),
+    path('reset-ai-chat/', views.reset_ai_chat, name='reset_ai_chat'),
     path('', views.auth, name="auth"),
     path('logout', views.logoutfunc, name="logout"),
     path('dashboard', views.dashboard, name="dashboard"),

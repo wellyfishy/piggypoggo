@@ -16,6 +16,20 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import openai
 from decouple import config
+import re
+import uuid
+from decimal import Decimal, InvalidOperation
+
+def format_response(text):
+    text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+    text = text.replace('\n', '<br>')
+
+    return text
+
+@csrf_exempt
+def reset_ai_chat(request):
+    request.session.pop('chat_history', None)
+    return JsonResponse({'status': 'reset'})
 
 @require_POST
 @csrf_exempt
@@ -25,27 +39,35 @@ def tanya_ai(request):
     if not deskripsi:
         return JsonResponse({'response': 'Deskripsi tidak boleh kosong.'}, status=400)
 
+    if 'chat_history' not in request.session:
+        request.session['chat_history'] = []
+
+    history = request.session['chat_history']
+
+    history.append({"role": "user", "content": deskripsi})
+
     try:
         client = openai.OpenAI(
-            api_key=f"{config('llama_3_api_key')}",
+            api_key=config('llama_3_api_key'),
             base_url="https://api.groq.com/openai/v1"
         )
 
+        full_messages = [{"role": "system", "content": "Kamu adalah seorang dokter hewan ahli babi. Jawablah menggunakan bahasa indonesia."}] + history
+
         response = client.chat.completions.create(
             model="llama3-70b-8192",
-            # messages=[
-            #     {"role": "system", "content": "Kamu adalah seorang dokter hewan ahli babi."},
-            #     {"role": "user", "content": f"Babi saya mengalami: {deskripsi}. Apa diagnosis dan saran pengobatannya? Jawab se-simpel mungkin."}
-            # ],
-            messages=[
-                {"role": "system", "content": "Kamu adalah seorang dokter hewan ahli babi lalu memiliki humor yang bagus."},
-                {"role": "user", "content": f"{deskripsi}."}
-            ],
+            messages=full_messages,
             temperature=0.7
         )
 
         ai_reply = response.choices[0].message.content.strip()
-        return JsonResponse({'response': ai_reply})
+        formatted_reply = format_response(ai_reply)
+
+        history.append({"role": "assistant", "content": ai_reply})
+
+        request.session['chat_history'] = history
+
+        return JsonResponse({'response': formatted_reply})
 
     except Exception as e:
         return JsonResponse({'response': f'Error dari AI: {str(e)}'}, status=500)
@@ -178,6 +200,8 @@ def kandang(request):
 @status_required([1, 2])
 def tambahKandang(request):
     all_babis = Babi.objects.filter(kandang=None, terjual=False)
+    for babi in all_babis:
+        babi.laporan = Laporan.objects.filter(babi=babi).last()
 
     if request.method == 'POST':
         nomor_kandang = request.POST.get('nomor_kandang')
@@ -247,11 +271,15 @@ def hapusKandang(request, kandang_pk):
 @login_required
 @status_required([1, 2])
 def babi(request):
+    status = request.GET.get('status')
     today = now().date()
     current_month = today.month
     current_year = today.year
 
-    all_babis = Babi.objects.all().order_by('-pk')
+    if status == 'terjual':
+        all_babis = Babi.objects.filter(terjual=True).order_by('-pk')
+    else:
+        all_babis = Babi.objects.filter(terjual=False).order_by('-pk')
 
     for babi in all_babis:
         laporans = Laporan.objects.filter(babi=babi)
@@ -265,7 +293,7 @@ def babi(request):
             babi.harga_bulan_ini = format_number(babi.harga)
 
             for laporan in laporans:
-                babi.bb_rata_rata += laporan.berat_badan
+                babi.bb_rata_rata += Decimal(laporan.berat_badan)
 
             if babi.bb_rata_rata != 0:
                 babi.bb_rata_rata = babi.bb_rata_rata / laporans.count() 
@@ -384,7 +412,7 @@ def editLaporan(request, laporan_pk):
             harga = int(harga)
             status_kesehatan = request.POST.get('kesehatan')
 
-            laporan.berat_badan = berat_badan
+            laporan.berat_badan = Decimal(berat_badan)
             babi.harga = harga
 
             if obat == '1':

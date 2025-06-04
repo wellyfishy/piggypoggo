@@ -32,7 +32,12 @@
                                         {% endif %}
                                     {% endfor %}
                                 </select>
-                            </div>  
+                            </div>
+                            <div class="form-group">
+                                <label for="kapasitas">Total Berat dan Kapasitas Maksimum (KG)</label>
+                                <input type="kapasitas" class="form-control" id="kapasitas" name="kapasitas_kandang" placeholder="kapasitas Kandang" value="0" disabled>
+                                <small id="kapasitasHelp" class="form-text text-muted">Terhitung otomatis.</small>
+                            </div>
                             <div class="d-flex justify-content-end mt-3">
                                 <a href="{% url 'kandang' %}" class="btn btn-danger me-2">Kembali</a>
                                 <button type="submit" class="btn btn-success">Save</button>

@@ -15,6 +15,12 @@
                                 <h6><b>Babi mu sakit? Tanya AI!</b></h6>
                                 <p class="text-muted">Beri ciri-ciri penyakit seperti: diare, tantrum, dsb</p>
                             </div>
+                            <div>
+                                <button class="btn btn-warning" id="reset-chat-btn">
+                                    Reset Ingatan AI
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <div class="form-group w-100">
@@ -45,7 +51,12 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="card-title" style="margin-right: 10px;">Semua Babi PiggyPoggo</div>
+                        <div class="card-title" style="margin-right: 10px;">
+                            Semua Babi PiggyPoggo
+                            <a href="{% url 'babi' %}?status=belum_terjual" class="btn btn-primary" style="color: white">Belum Terjual</a>
+                            <a href="{% url 'babi' %}?status=terjual" class="btn btn-primary btn-border" style="color: white">Sudah Terjual</a>
+                        </div>
+
                         <div>
                             <a href="{% url 'tambah-babi' %}" class="btn btn-success" style="font-size: inherit; padding: 5px 10px;">+ Tambah Babi</a>
                         </div>
@@ -93,7 +104,7 @@
                                     {% if babi.terjual %}
                                     <span class="badge badge-success">Terjual</span>
                                     {% else %}
-                                    <a href="{% url 'edit-laporan' laporan_pk=babi.last_laporan.pk %}" class="btn btn-warning">
+                                    <a href="{% url 'edit-laporan' laporan_pk=babi.last_laporan.pk %}" class="btn btn-warning btn-sm" style="padding: 2px 6px; font-size: 12px;">
                                         <i class="fa fa-pen"></i>
                                     </a>
                                     {% endif %}
@@ -135,6 +146,22 @@
             complete: function () {
                 // Re-enable button and restore text
                 $btn.prop('disabled', false).text('Kirim');
+            }
+        });
+    });
+
+    $('#reset-chat-btn').click(function() {
+        $.ajax({
+            type: 'POST',
+            url: '{% url "reset_ai_chat" %}',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+                $('#ai-response').html('Ingatan AI sudah di reset. Mulai awal!');
+            },
+            error: function() {
+                alert('Failed to reset chat.');
             }
         });
     });

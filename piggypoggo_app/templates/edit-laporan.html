@@ -56,7 +56,7 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="berat_badan">Berat Badan</label>
-                                <input type="number" class="form-control" id="berat_badan" name="berat_badan_babi" placeholder="0" value="{{ laporan.berat_badan }}" required>
+                                <input type="number" class="form-control" id="berat_badan" name="berat_badan_babi" placeholder="0" value="{{ laporan.berat_badan }}" required step="0.1">
                                 <small id="berat_badanHelp" class="form-text text-muted">Tulis angkanya saja (KG).*</small>
                             </div>
 
