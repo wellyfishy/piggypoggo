@@ -186,9 +186,17 @@ def kandang(request):
 
     for kandang in all_kandangs:
         count = 0
+        berat = 0
         all_babis = Babi.objects.filter(kandang=kandang)
+
+        for babi in all_babis:
+            babi.laporan = Laporan.objects.filter(babi=babi).last()
+            berat += Decimal(babi.laporan.berat_badan)
+
         count += all_babis.count()
+
         kandang.banyaknya_babi = count
+        kandang.berat_kandang = berat
         
     context = {
         'on': 'kandang',
@@ -227,6 +235,15 @@ def tambahKandang(request):
 def editKandang(request, kandang_pk):
     kandang = Kandang.objects.get(pk=kandang_pk)
     all_babis = Babi.objects.filter(Q(terjual=False) & (Q(kandang=None) | Q(kandang=kandang)))
+    
+    filtered_babis = []
+    for babi in all_babis:
+        laporan = Laporan.objects.filter(babi=babi).last()
+        if laporan and Decimal(laporan.berat_badan) > 0:
+            babi.laporan = laporan
+            filtered_babis.append(babi)
+
+    all_babis = filtered_babis
 
     if request.method == 'POST':
         nomor_kandang = request.POST.get('nomor_kandang')
@@ -275,6 +292,7 @@ def babi(request):
     today = now().date()
     current_month = today.month
     current_year = today.year
+    selected_status = status
 
     if status == 'terjual':
         all_babis = Babi.objects.filter(terjual=True).order_by('-pk')
@@ -322,6 +340,7 @@ def babi(request):
     context = {
         'on': 'babi',
         'all_babis': all_babis,
+        'selected_status': selected_status,
     }
     return render(request, 'babi.html', context)
 

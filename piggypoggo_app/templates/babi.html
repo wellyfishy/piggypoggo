@@ -53,8 +53,8 @@
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="card-title" style="margin-right: 10px;">
                             Semua Babi PiggyPoggo
-                            <a href="{% url 'babi' %}?status=belum_terjual" class="btn btn-primary" style="color: white">Belum Terjual</a>
-                            <a href="{% url 'babi' %}?status=terjual" class="btn btn-primary btn-border" style="color: white">Sudah Terjual</a>
+                            <a href="{% url 'babi' %}?status=belum_terjual" class="btn btn-primary {% if selected_status == 'terjual' %}btn-border{% endif %}" style="color: white">Belum Terjual</a>
+                            <a href="{% url 'babi' %}?status=terjual" class="btn btn-primary {% if selected_status == 'belum_terjual' or not selected_status %}btn-border{% endif %}" style="color: white">Sudah Terjual</a>
                         </div>
 
                         <div>

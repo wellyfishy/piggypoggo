@@ -39,7 +39,7 @@
                             <tr>
                                 <td>Kandang {{ kandang }}</td>
                                 <td style="text-align: center;"><b>{{ kandang.banyaknya_babi }} Babi</b></td>
-                                <td style="text-align: center;"><b>0/200 KG</b></td>
+                                <td style="text-align: center;"><b><span class="{% if kandang.berat_kandang > 200 %}text-danger{% elif kandang.berat_kandang > 150 %}text-warning{% endif %}">{{ kandang.berat_kandang }}</span> / 200 KG</b></td>
                                 <td style="text-align: center;">
                                     <a href="{% url 'edit-kandang' kandang_pk=kandang.pk %}" class="btn btn-warning" style="font-size: inherit; padding: 5px 10px;">
                                         <i class="fa fa-pen"></i>

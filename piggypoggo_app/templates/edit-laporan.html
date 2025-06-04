@@ -24,7 +24,7 @@
                                 <small id="namaHelp" class="form-text text-muted">Nama babi harus berbeda.</small>
                             </div>
 
-                            <div class="form-group">
+                            {% comment %} <div class="form-group">
                                 <label for="nomor">Nomor Kandang</label>
                                 <select class="form-select select2" name="pk_kandang" id="pk_kandang" style="width: 100%;">
                                     <option value="-">-</option>
@@ -36,7 +36,7 @@
                                         {% endif %}
                                     {% endfor %}
                                 </select>
-                            </div>
+                            </div> {% endcomment %}
 
                             <div class="d-flex justify-content-end mt-3">
                                 <button type="submit" name="submit_type" value="babi" class="btn btn-success">Simpan</button>
