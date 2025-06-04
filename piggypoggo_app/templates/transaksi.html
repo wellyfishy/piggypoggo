@@ -1,0 +1,215 @@
+{% extends "base-dashboard.html" %} {% load static %}
+
+{% block style %}
+<style>
+@media print {
+  body {
+    visibility: hidden;
+  }
+
+  .print-hide {
+    display: none;
+  }
+
+  .print-visible {
+    visibility: visible;
+  }
+
+  #print-area {
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-left: -225px;
+    margin-top: 30px;
+  }
+}
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="row row-card-no-pd">
+        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+            <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                <div>
+                    <h6><b>Babi Terjual</b></h6>
+                    <p class="text-muted">Total banyaknya babi terjual</p>
+                </div>
+                <h4 class="text-info fw-bold">{{ babi_terjual_count }}</h4>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                <p class="text-muted mb-0"></p>
+                <p class="text-info mb-0">
+                    <b>{{ babi_terjual_count }} Babi</b>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+            <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                <div>
+                    <h6><b>Transaksi</b></h6>
+                    <p class="text-muted">Total banyaknya transaksi</p>
+                </div>
+                <h4 class="text-danger fw-bold">{{ all_notas.count }}</h4>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                <p class="text-muted mb-0"></p>
+                <p class="text-danger mb-0">
+                    <b>{{ all_notas.count }} Transaksi</b>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+            <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                <div>
+                    <h6><b>Omset Bulan Ini</b></h6>
+                    <p class="text-muted">Total omset bulan ini</p>
+                </div>
+                <h4 class="text-warning fw-bold"></h4>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                <p class="text-muted mb-0"></p>
+                <p class="text-muted mb-0">
+                    <b>Rp. {{ omset_bulan_ini }}</b>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+            <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                <div>
+                    <h6><b>Omset tahun ini</b></h6>
+                    <p class="text-muted">Total omset tahun ini</p>
+                </div>
+                <h4 class="text-warning fw-bold"></h4>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                <p class="text-muted mb-0"></p>
+                <p class="text-muted mb-0">
+                    <b>Rp. {{ omset_tahun_ini }}</b>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="page-header">
+          <h3 class="fw-bold mb-3"></h3>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card" id="print-area">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <form method="POST" class="d-flex align-items-center gap-3">
+                            {% csrf_token %}
+                            <div class="card-title mb-0">
+                                <strong class="print-visible" style="font-size: 15px;">Transaksi PiggyPoggo: {{ mulai }} - {{ hingga }}</strong><button type="button" onclick="window.print()" class="btn btn-success print-hide" style="font-size: 15px; padding: 5px 10px; margin-left: 5px;">Cetak <i class="fa fa-print"></i></button><br><hr>
+                                <div class="d-flex align-items-center gap-2 print-hide">
+                                <span class="print-hide">Filter:</span>
+                                <input type="date" class="form-control print-hide" name="mulai-dari">
+                                <span class="print-hide">-</span>
+                                <input type="date" class="form-control print-hide" name="hingga-dari">
+                                <button type="submit" class="btn btn-primary btn-sm print-hide">Terapkan</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <a href="{% url 'tambah-transaksi' %}" class="btn btn-success print-hide" style="font-size: inherit; padding: 5px 10px;">
+                        + Tambah Transaksi
+                        </a>
+                    </div>
+
+                    
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                            <th scope="col" style="text-align: center;">Kode</th>
+                            <th scope="col" style="text-align: center;">Nama Pembeli</th>
+                            <th scope="col" style="text-align: center;">Babi</th>
+                            <th scope="col" style="text-align: center;">Total</th>
+                            <th scope="col" style="text-align: center;">Tanggal Nota</th>
+                            <th scope="col" style="text-align: center;">Tanggal Diambil</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nota in all_notas %}
+                            <tr>
+                                <td><a href="">{{ nota.kode_nota }}</td>
+                                <td>{{ nota.nama_pembeli }}</td>
+                                <td style="text-align: center;">
+                                    {% for dnota in nota.detailnota_set.all %} 
+                                        {{ dnota.babi }}
+                                        <br>
+                                    {% endfor %}
+                                </td>
+                                <td style="text-align: center;"><b>Rp. {{ nota.formatted_total_harga }}</b></td>
+                                <td style="text-align: center;">{{ nota.tanggal_nota|date:'d - m - Y' }} | {{ nota.tanggal_nota|time:'' }}</td>
+                                <td style="text-align: center;">{{ nota.tanggal_dibeli|date:'d - m - Y' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                <div class="card-header">
+                    <div class="card-head-row">
+                    <div class="card-title">Pengingatmu</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if pengingat %}
+                    {% for pengingat in pengingat %}
+                    <div class="d-flex align-items-center ms-3">
+                        <h6 class="text-uppercase fw-bold mb-1 mb-0">
+                            Babi dalam nota {{ pengingat.kode_nota }} akan diambil pada tanggal:
+                            <span class="text-warning ps-3">{{ pengingat.tanggal_dibeli }}</span>
+                        </h6>
+                    </div>
+                    <div class="separator-dashed"></div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="d-flex align-items-center ms-3">
+                        <h6 class="text-uppercase fw-bold mb-1 mb-0">
+                            Tidak ada pengingat
+                            <span class="text-warning ps-3"></span>
+                        </h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock content %}
+
+{% block script %}
+{% endblock script %}

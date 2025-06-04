@@ -1,0 +1,94 @@
+{% extends "base-dashboard.html" %} {% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="page-header">
+          <h3 class="fw-bold mb-3"></h3>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'dashboard' %}" class="btn btn-danger" style="margin-top: -20px;">Kembali</a>
+                <hr>
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-title" style="margin-right: 10px;">Riwayat Aktivitas PiggyPoggo</div>
+                        <div>
+                            <ul class="nav nav-pills nav-secondary nav-pills-no-bd nav-sm" id="pills-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link {% if filter == 'semua' %}active{% endif %}" href="?filter=semua">Semuanya</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if filter == 'hari_ini' %}active{% endif %}" href="?filter=hari_ini">Hari Ini</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if filter == 'minggu_ini' %}active{% endif %}" href="?filter=minggu_ini">Minggu Ini</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if filter == 'bulan_ini' %}active{% endif %}" href="?filter=bulan_ini">Bulan Ini</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                            <th scope="col" style="text-align: center;">Detail Riwayat</th>
+                            <th scope="col" style="text-align: center;">Jam</th>
+                            <th scope="col" style="text-align: center;">Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for riwayat in page_obj %}
+                            <tr>
+                                <td>{{ riwayat }}</td>
+                                <td style="text-align: center;">{{ riwayat.tanggal|time }}</td>
+                                <td style="text-align: center;">{{ riwayat.tanggal|date:'d-m-Y' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                    <div class="dataTables_paginate paging_simple_numbers" style="margin-top: -20px; margin-left: 20px;">
+                        <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="paginate_button page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&filter={{ filter }}">‹</a>
+                            </li>
+                        {% else %}
+                            <li class="paginate_button page-item disabled">
+                            <span class="page-link">‹</span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="paginate_button page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="paginate_button page-item">
+                                <a class="page-link" href="?page={{ num }}&filter={{ filter }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="paginate_button page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&filter={{ filter }}">›</a>
+                            </li>
+                        {% else %}
+                            <li class="paginate_button page-item disabled">
+                            <span class="page-link">›</span>
+                            </li>
+                        {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,167 @@
+{% extends "base-dashboard.html" %} {% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="page-inner">
+    <div class="page-header">
+      <h3 class="fw-bold mb-3">Kandang</h3>
+    </div>
+    <h6 class="op-7 mb-2" style="margin-top: -30px;">Halaman Utama PiggyPoggo</h6>
+    <div class="row row-card-no-pd">
+      <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6><b>Banyak Kandang</b></h6>
+                <p class="text-muted">Total banyaknya kandang</p>
+              </div>
+              <h4 class="text-info fw-bold">{{ all_kandang_count }}</h4>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+              <p class="text-muted mb-0"></p>
+              <p class="text-muted mb-0">
+                <b>{{ all_kandang_count }} Kandang</b>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6><b>Banyak Babi</b></h6>
+                <p class="text-muted">Total banyaknya babi</p>
+              </div>
+              <h4 class="text-danger fw-bold">{{ all_babi_count }}</h4>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+              <p class="text-muted mb-0"></p>
+              <p class="text-muted mb-0">
+                <b>{{ all_babi_count }} Babi</b>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6><b>Babi/Kandang</b></h6>
+                <p class="text-muted">Rata-rata babi per kandang</p>
+              </div>
+              <h4 class="text-warning fw-bold">{{ average_babi_per_kandang }}</h4>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+              <p class="text-muted mb-0"></p>
+              <p class="text-muted mb-0">
+                <b>{{ average_babi_per_kandang }} Babi/Kandang</b>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-6 col-xl-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6><b>Total omset</b></h6>
+                <p class="text-muted">Total semua omset perusahaan</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+              <p class="text-muted mb-0"></p>
+              <p class="text-muted mb-0"><b>Rp. {{ omset_full }}</b></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-head-row card-tools-still-right">
+              <div class="card-title">Histori Aktivitas</div>
+              <div class="card-tools">
+                <a href="{% url 'riwayat' %}" class="btn btn-success">
+                  <i class="fa fa-eye"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <ol class="activity-feed">
+              {% for riwayat in all_riwayats %}
+              <li class="feed-item feed-item-secondary">
+                <time class="date" datetime="">{{ riwayat.tanggal }}</time>
+                <span class="text">
+                  {{ riwayat }}
+                </span>
+              </li>
+              {% endfor %}
+              <li class="feed-item feed-item-secondary">
+                <span class="text">
+                  ...
+                </span>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-head-row">
+              <div class="card-title">To-do list harian mu</div>
+              <div class="card-tools">
+                <ul class="nav nav-pills nav-secondary nav-pills-no-bd nav-sm" id="pills-tab" role="tablist">
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            {% if dailies %}
+            {% for daily in dailies %}
+            <div class="d-flex align-items-center ms-3">
+              <div class="selectgroup selectgroup-pills me-2">
+                <form method="POST">
+                  {% csrf_token %}
+                  <label class="selectgroup-item mb-0">
+                    <input type="checkbox" name="daily" value="{{ daily.pk }}"
+                          class="selectgroup-input"
+                          onchange="this.form.submit()"
+                          {% if daily.get_status == 'Sudah' %}checked disabled{% endif %}>
+                    <span class="selectgroup-button">
+                      <i class="fas fa-check"></i>
+                    </span>
+                  </label>
+                </form>
+              </a>
+              </div>
+              <h6 class="text-uppercase fw-bold mb-1 mb-0">
+                {{ daily.nama_daily }}
+                <span class="text-warning ps-3"></span>
+              </h6>
+            </div>
+            <div class="separator-dashed"></div>
+            {% endfor %}
+            {% else %}
+            <div class="d-flex align-items-center ms-3">
+              <h6 class="text-uppercase fw-bold mb-1 mb-0">Tidak ada daily</h6>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block script %}{% endblock script %}
+      

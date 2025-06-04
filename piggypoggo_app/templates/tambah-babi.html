@@ -1,0 +1,56 @@
+{% extends "base-dashboard.html" %} {% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="page-header">
+          <h3 class="fw-bold mb-3"></h3>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-title" style="margin-right: 10px;">Tambah Babi</div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="nama">Nama Babi</label>
+                                <input type="text" class="form-control" id="nama" name="nama_babi" placeholder="Nama Babi">
+                                <small id="namaHelp" class="form-text text-muted">Nama babi harus berbeda.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="nomor">Nomor Kandang (opsional)</label>
+                                <select class="form-select select2" name="pk_kandang" id="pk_kandang" style="width: 100%;">
+                                    <option value="-">-</option>
+                                    {% for kandang in all_kandangs %}
+                                    <option value="{{ kandang.pk }}">Kandang {{ kandang }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-end mt-3">
+                                <a href="{% url 'babi' %}" class="btn btn-danger me-2">Kembali</a>
+                                <button type="submit" class="btn btn-success">Tambah</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+      $('.select2').select2({
+        placeholder: "Pilih kandang...",
+        allowClear: true
+      });
+    });
+</script>
+{% endblock script %}

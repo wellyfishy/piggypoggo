@@ -1,0 +1,78 @@
+{% extends "base-dashboard.html" %} {% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="page-header">
+          <h3 class="fw-bold mb-3"></h3>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-title" style="margin-right: 10px;">Kandang PiggyPoggo</div>
+                        <div>
+                            <a href="{% url 'tambah-kandang' %}" class="btn btn-success" style="font-size: inherit; padding: 5px 10px;">+ Tambah Kandang</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                            <th scope="col" style="text-align: center;">No Kandang</th>
+                            <th scope="col" style="text-align: center;">Jumlah dan Maks Kapasitas</th>
+                            <th scope="col" style="text-align: center;">MISC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kandang in all_kandangs %}
+                            <tr>
+                                <td>Kandang {{ kandang }}</td>
+                                <td style="text-align: center;"><b>{{ kandang.banyaknya_babi }}/6 Babi</b></td>
+                                <td style="text-align: center;">
+                                    <a href="{% url 'edit-kandang' kandang_pk=kandang.pk %}" class="btn btn-warning" style="font-size: inherit; padding: 5px 10px;">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger" style="font-size: inherit; padding: 5px 10px;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ kandang.pk }}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+                                    <div class="modal fade" id="confirmDeleteModal{{ kandang.pk }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ kandang.pk }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="confirmDeleteLabel{{ kandang.pk }}">Konfirmasi Hapus</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Apakah kamu yakin ingin menghapus kandang {{ kandang }}?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <a href="{% url 'hapus-kandang' kandang_pk=kandang.pk %}" class="btn btn-danger">Hapus</a>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock content %}
