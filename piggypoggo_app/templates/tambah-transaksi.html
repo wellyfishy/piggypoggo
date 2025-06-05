@@ -74,6 +74,28 @@
 
             $('#total_harga').val(total.toLocaleString('id-ID'));
         });
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+        e.preventDefault(); // prevent normal submission
+
+        // You may want to first send data with AJAX/fetch here, then:
+        let nama = document.getElementById("nama_pembeli").value;
+        let tanggal = document.getElementById("tanggal").value;
+        let total = document.getElementById("total_harga").value;
+
+        let notaWindow = window.open('', '', 'width=600,height=400');
+        notaWindow.document.write('<html><head><title>Nota</title></head><body>');
+        notaWindow.document.write('<h3>Nota Transaksi</h3>');
+        notaWindow.document.write('<p><strong>Nama:</strong> ' + nama + '</p>');
+        notaWindow.document.write('<p><strong>Tanggal:</strong> ' + tanggal + '</p>');
+        notaWindow.document.write('<p><strong>Total Harga:</strong> ' + total + '</p>');
+        notaWindow.document.write('</body></html>');
+        notaWindow.document.close();
+        notaWindow.print();
+
+        // After print, you can now submit the form
+        this.submit();
+    });
     });
 </script>
 {% endblock script %}
