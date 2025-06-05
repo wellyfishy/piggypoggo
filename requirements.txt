@@ -12,6 +12,7 @@ httpx==0.28.1
 idna==3.10
 jiter==0.10.0
 openai==1.82.1
+pillow==11.2.1
 pydantic==2.11.5
 pydantic_core==2.33.2
 python-decouple==3.8

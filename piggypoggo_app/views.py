@@ -411,28 +411,33 @@ def editLaporan(request, laporan_pk):
         status = 'Belum'
 
     if request.method == 'POST':
-        if request.POST.get('submit_type') == 'babi':
+        # if request.POST.get('submit_type') == 'babi':
+        #     nama_babi = request.POST.get('nama_babi')
+        #     pk_kandang = request.POST.get('pk_kandang')
+        #     if pk_kandang == '-':
+        #         babi.kandang = None
+        #     else:
+        #         kandang = Kandang.objects.get(pk=pk_kandang)
+        #         babi.kandang = kandang
+
+        #     babi.nama_babi = nama_babi
+        #     babi.save()
+
+        if request.POST.get('submit_type') == 'laporan':
             nama_babi = request.POST.get('nama_babi')
-            pk_kandang = request.POST.get('pk_kandang')
-            if pk_kandang == '-':
-                babi.kandang = None
-            else:
-                kandang = Kandang.objects.get(pk=pk_kandang)
-                babi.kandang = kandang
-
-            babi.nama_babi = nama_babi
-            babi.save()
-
-        elif request.POST.get('submit_type') == 'laporan':
             berat_badan = request.POST.get('berat_badan_babi')
             obat = request.POST.get('obat')
             harga = request.POST.get('harga_babi')
             harga = harga.replace('.', '')
             harga = int(harga)
             status_kesehatan = request.POST.get('kesehatan')
+            foto_babi = request.FILES.get("foto_babi")  
 
             laporan.berat_badan = Decimal(berat_badan)
+            babi.nama_babi = nama_babi
             babi.harga = harga
+            if foto_babi:
+                laporan.foto_babi = foto_babi
 
             if obat == '1':
                 laporan.obat = True

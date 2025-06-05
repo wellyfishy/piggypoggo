@@ -64,6 +64,7 @@ class Laporan(models.Model):
     tanggal = models.DateTimeField(null=True, blank=True)
     berat_badan = models.CharField(max_length=10, null=True, blank=True)
     obat = models.BooleanField(default=False)
+    foto_babi = models.ImageField(upload_to='foto_babi/', blank=True, null=True)
 
     def __str__(self):
         return f'{self.babi}'
