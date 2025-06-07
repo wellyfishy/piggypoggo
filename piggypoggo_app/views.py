@@ -484,8 +484,8 @@ def transaksi(request):
     omset_tahun_ini = format_number(omset_tahun_ini)
 
     pengingat = Nota.objects.filter(tanggal_dibeli__gte=today)
-    mulai = 'Hari ini'
-    hingga = 'Hari ini'
+    mulai = 'Semua'
+    hingga = 'Semua'
 
     if request.method == 'POST':
         mulai = request.POST.get('mulai-dari')  

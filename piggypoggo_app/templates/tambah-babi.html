@@ -21,7 +21,7 @@
                                 <input type="text" class="form-control" id="nama" name="nama_babi" placeholder="Nama Babi">
                                 <small id="namaHelp" class="form-text text-muted">Nama babi harus berbeda.</small>
                             </div>
-                            <div class="form-group">
+                            {% comment %} <div class="form-group">
                                 <label for="nomor">Nomor Kandang (opsional)</label>
                                 <select class="form-select select2" name="pk_kandang" id="pk_kandang" style="width: 100%;">
                                     <option value="-">-</option>
@@ -29,7 +29,7 @@
                                     <option value="{{ kandang.pk }}">Kandang {{ kandang }}</option>
                                     {% endfor %}
                                 </select>
-                            </div>
+                            </div> {% endcomment %}
                             <div class="d-flex justify-content-end mt-3">
                                 <a href="{% url 'babi' %}" class="btn btn-danger me-2">Kembali</a>
                                 <button type="submit" class="btn btn-success">Tambah</button>
