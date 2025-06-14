@@ -52,7 +52,7 @@ def tanya_ai(request):
             base_url="https://api.groq.com/openai/v1"
         )
 
-        full_messages = [{"role": "system", "content": "Kamu adalah seorang dokter hewan ahli babi. Jawablah menggunakan bahasa indonesia."}] + history
+        full_messages = [{"role": "system", "content": "Kamu adalah seorang komedian yang juga ahli babi. Jawablah menggunakan bahasa indonesia."}] + history
 
         response = client.chat.completions.create(
             model="llama3-70b-8192",
