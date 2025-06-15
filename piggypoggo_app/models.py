@@ -48,9 +48,13 @@ class Babi(models.Model):
     terjual = models.BooleanField(default=False)
     harga = models.IntegerField(default=0)
     sakit = models.BooleanField(default=False)
+    tanggal_lahir = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.nama_babi}'
+    
+    def get_umur(self):
+        return now - self.tanggal_lahir
     
 class Riwayat(models.Model):
     riwayat = models.TextField(null=True, blank=True)

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import *
-from django.db.models import Q
+from django.db.models import Q # type: ignore
 from django.db.models import Count, Avg
 from datetime import datetime, time
 from django.utils.timezone import now
@@ -208,8 +208,14 @@ def kandang(request):
 @status_required([1, 2])
 def tambahKandang(request):
     all_babis = Babi.objects.filter(kandang=None, terjual=False)
+    filtered_babis = []
     for babi in all_babis:
-        babi.laporan = Laporan.objects.filter(babi=babi).last()
+        laporan = Laporan.objects.filter(babi=babi).last()
+        if laporan and Decimal(laporan.berat_badan) > 0:
+            babi.laporan = laporan
+            filtered_babis.append(babi)
+
+    all_babis = filtered_babis
 
     if request.method == 'POST':
         nomor_kandang = request.POST.get('nomor_kandang')
@@ -220,6 +226,17 @@ def tambahKandang(request):
         else:
             kandang = Kandang.objects.create(nomor_kandang=nomor_kandang)
             riwayat = Riwayat.objects.create(riwayat=f'Membuat kandang {kandang.nomor_kandang}')
+            selected_babis = list(map(int, request.POST.getlist('babi')))
+            for babi in all_babis:
+                if babi.pk in selected_babis:
+                    babi.kandang = kandang
+                else:
+                    babi.kandang = None
+                babi.save()
+
+            kandang.nomor_kandang = nomor_kandang
+            kandang.save()
+
             messages.success(request, f'Sukses membuat kandang dengan nomor {nomor_kandang}')
         
         return redirect('kandang')
@@ -294,6 +311,16 @@ def babi(request):
     current_year = today.year
     selected_status = status
 
+    if request.method == 'POST':
+        if request.POST.get('submit_type') == 'hapus':
+            babi_pk = request.POST.get('babi_pk')
+            alasan = request.POST.get('alasan')
+            babi = Babi.objects.get(pk=babi_pk)
+            riwayat = Riwayat.objects.create(riwayat=f'Menghapus babi {babi.nama_babi}. Alasan: {alasan}')
+            messages.success(request, f'Sukses menghapus babi {babi.nama_babi}.')
+            babi.delete()
+            return redirect('babi')
+
     if status == 'terjual':
         all_babis = Babi.objects.filter(terjual=True).order_by('-pk')
     else:
@@ -311,7 +338,10 @@ def babi(request):
             babi.harga_bulan_ini = format_number(babi.harga)
 
             for laporan in laporans:
-                babi.bb_rata_rata += Decimal(laporan.berat_badan)
+                if laporan.berat_badan:
+                    babi.bb_rata_rata += Decimal(laporan.berat_badan)
+                else:
+                    babi.bb_rata_rata = 0
 
             if babi.bb_rata_rata != 0:
                 babi.bb_rata_rata = babi.bb_rata_rata / laporans.count() 
@@ -379,15 +409,45 @@ def tambahBabi(request):
 
     if request.method == 'POST':
         nama_babi = request.POST.get('nama_babi')
-        pk_kandang = request.POST.get('pk_kandang')
+        tanggal_lahir = request.POST.get('tanggal')
+
+        berat_badan = request.POST.get('berat_badan_babi')
+        obat = request.POST.get('obat')
+        harga = request.POST.get('harga_babi')
+        harga = harga.replace('.', '')
+        harga = int(harga)
+        status_kesehatan = request.POST.get('kesehatan')
+        foto_babi = request.FILES.get("foto_babi")
 
         if Babi.objects.filter(nama_babi=nama_babi.strip()).exists():
             messages.error(request, f'Babi dengan nama "{nama_babi}" sudah ada!')
         else:
-            kandang = None
-            if pk_kandang != '-':
-                kandang = Kandang.objects.get(pk=pk_kandang)
-            babi = Babi.objects.create(nama_babi=nama_babi.strip(), kandang=kandang)
+            babi = Babi.objects.create(nama_babi=nama_babi.strip(), tanggal_lahir=tanggal_lahir)
+
+            laporan = Laporan.objects.create(babi=babi, tanggal=now())
+
+            
+
+            laporan.berat_badan = Decimal(berat_badan)
+            babi.nama_babi = nama_babi
+            babi.harga = harga
+
+            if foto_babi:
+                laporan.foto_babi = foto_babi
+
+            if obat == '1':
+                laporan.obat = True
+            elif obat == '2':
+                laporan.obat = False
+
+            if status_kesehatan == '1':
+                babi.sakit = False
+            elif status_kesehatan == '2':
+                babi.sakit = True
+
+            laporan.save()
+            babi.save()
+
             messages.success(request, f'Babi dengan nama "{babi.nama_babi}" berhasil di tambah!')
             riwayat = Riwayat.objects.create(riwayat=f'Berhasil menambah babi {babi.nama_babi}')
 
@@ -411,18 +471,6 @@ def editLaporan(request, laporan_pk):
         status = 'Belum'
 
     if request.method == 'POST':
-        # if request.POST.get('submit_type') == 'babi':
-        #     nama_babi = request.POST.get('nama_babi')
-        #     pk_kandang = request.POST.get('pk_kandang')
-        #     if pk_kandang == '-':
-        #         babi.kandang = None
-        #     else:
-        #         kandang = Kandang.objects.get(pk=pk_kandang)
-        #         babi.kandang = kandang
-
-        #     babi.nama_babi = nama_babi
-        #     babi.save()
-
         if request.POST.get('submit_type') == 'laporan':
             nama_babi = request.POST.get('nama_babi')
             berat_badan = request.POST.get('berat_badan_babi')
@@ -468,7 +516,6 @@ def editLaporan(request, laporan_pk):
 def transaksi(request):
     all_notas = Nota.objects.all().order_by('-pk')
     babi_terjual_count = Babi.objects.filter(terjual=True).count()
-
 
     today = now().date()
     omset_bulan_ini = Nota.objects.filter(

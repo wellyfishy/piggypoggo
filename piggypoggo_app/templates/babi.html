@@ -107,9 +107,38 @@
                                     <a href="{% url 'edit-laporan' laporan_pk=babi.last_laporan.pk %}" class="btn btn-warning btn-sm" style="padding: 2px 6px; font-size: 12px;">
                                         <i class="fa fa-pen"></i>
                                     </a>
+                                    <a href="#" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 12px;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ babi.pk }}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
                                     {% endif %}
                                 </td>
                             </tr>
+                            <div class="modal fade" id="confirmDeleteModal{{ babi.pk }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ babi.pk }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="confirmDeleteLabel{{ babi.pk }}">Konfirmasi Hapus</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form method="POST">
+                                    <div class="modal-body">
+                                        Apakah kamu yakin ingin menghapus babi <b>{{ babi }}</b>?
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="alasan">Alasan</label>
+                                                <input type="hidden" name="babi_pk" value="{{ babi.pk }}">
+                                                <textarea type="text" class="form-control" id="alasan" name="alasan" placeholder="Alasan menghapus babi"></textarea>
+                                                <small class="form-text text-muted">Tidak perlu di isi.</small>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" name="submit_type" value="hapus" class="btn btn-danger">Hapus</button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+                            </div>
                             {% endfor %}
                         </tbody>
                         </table>

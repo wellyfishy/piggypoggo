@@ -4,8 +4,10 @@
 <div class="container">
     <div class="page-inner">
         <div class="page-header">
-          <h3 class="fw-bold mb-3"></h3>
+            <h3 class="fw-bold mb-3"></h3>
         </div>
+        <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -14,31 +16,113 @@
                     </div>
                     
                     <div class="card-body">
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="nama">Nama Babi</label>
-                                <input type="text" class="form-control" id="nama" name="nama_babi" placeholder="Nama Babi">
-                                <small id="namaHelp" class="form-text text-muted">Nama babi harus berbeda.</small>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nama">Nama Babi.*</label>
+                                        <input type="text" class="form-control" id="nama" name="nama_babi" placeholder="Nama Babi" required>
+                                        <small class="form-text text-muted">Nama babi harus berbeda.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="tanggal">Tanggal Lahir.*</label>
+                                        <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                                        <small id="tanggal" class="form-text text-muted">Masukan tanggal lahir babi.</small>
+                                    </div>
+                                </div>
                             </div>
-                            {% comment %} <div class="form-group">
-                                <label for="nomor">Nomor Kandang (opsional)</label>
-                                <select class="form-select select2" name="pk_kandang" id="pk_kandang" style="width: 100%;">
-                                    <option value="-">-</option>
-                                    {% for kandang in all_kandangs %}
-                                    <option value="{{ kandang.pk }}">Kandang {{ kandang }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div> {% endcomment %}
-                            <div class="d-flex justify-content-end mt-3">
-                                <a href="{% url 'babi' %}" class="btn btn-danger me-2">Kembali</a>
-                                <button type="submit" class="btn btn-success">Tambah</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="card-title" style="margin-right: 10px;">Laporan Bulanan | <span style="background-color:rgb(151, 103, 40); border-radius: 5px; color: white">Form Opsional</span></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="kesehatan">Status Kesehatan</label>
+                                        <select class="form-select" name="kesehatan" id="kesehatan">
+                                            <option value="1" selected>Sehat</option>
+                                            <option value="2">Sakit</option>
+                                        </select>
+                                        <small class="form-text text-muted">Pilih salah satu.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="obat">Status Obat</label>
+                                        <select class="form-select" name="obat" id="obat">
+                                            <option value="1">Sudah</option>
+                                            <option value="2" selected>Belum</option>
+                                        </select>
+                                        <small class="form-text text-muted">Pilih salah satu.</small>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="berat_badan">Berat Babi</label>
+                                        <input type="number" class="form-control" id="berat_badan" name="berat_badan_babi" placeholder="0" value="0" step="0.1">
+                                        <small class="form-text text-muted">Tulis angkanya saja (KG).</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="foto_babi">Foto Babi</label>
+                                        <input type="file" class="form-control" id="foto_babi" name="foto_babi" accept="image/*">
+                                        <small class="form-text text-muted">Unggah gambar babi.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="harga">Harga Babi</label>
+                                        <input type="text" class="form-control" id="harga" name="harga_babi" placeholder="0" value="0">
+                                        <small class="form-text text-muted">Tulis angkanya saja (Rp).</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="d-flex justify-content-end mt-4">
+                                            <a href="{% url 'babi' %}" class="btn btn-danger me-2">Kembali</a>
+                                            <button type="submit" class="btn btn-success">Tambah</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Foto Babi</strong>
+                    </div>
+                    <div class="card-body text-center">
+                        <img id="preview-img" 
+                        src="{% if laporan.foto_babi %}{{ laporan.foto_babi.url }}{% else %}https://via.placeholder.com/300x200?text=No+Image{% endif %}" 
+                        alt="Foto Babi" 
+                        class="img-fluid rounded" 
+                        style="max-height: 300px;">
                     </div>
                 </div>
             </div>
         </div>
+    </form>
     </div>
     
 </div>
@@ -51,6 +135,27 @@
         placeholder: "Pilih kandang...",
         allowClear: true
       });
+    });
+
+    document.getElementById('harga').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, ''); 
+        let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); 
+        e.target.value = formatted;
+    });
+
+    document.getElementById('foto_babi').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview-img');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "https://via.placeholder.com/300x200?text=No+Image";
+        }
     });
 </script>
 {% endblock script %}

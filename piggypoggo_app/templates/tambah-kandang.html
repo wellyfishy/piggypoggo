@@ -22,15 +22,25 @@
                                 <small id="nomorHelp" class="form-text text-muted">Nomor kandang harus berbeda.</small>
                             </div>
                             <div class="form-group">
-                                <label for="babi">Pilih babi (tidak harus di isi & maksimal kapasitas 6):</label>
+                                <label for="babi">Pilih babi **(tidak harus di isi, laporan berat badan harus di isi)**:</label>
                                 <select class="form-select select2" name="babi" id="babi" multiple="multiple" style="width: 100%;">
-                                    {% if all_babis %}
-                                        {% for babi in all_babis %}
-                                        <option value="{{ babi.pk }}">{{ babi }} - {{ babi.laporan.berat_badan }}</option>
-                                        {% endfor %}
-                                    {% endif %}
+                                    {% for babi in all_babis %}
+                                        {% with weight=babi.laporan.berat_badan %}
+                                            <option value="{{ babi.pk }}" data-weight="{{ weight }}">
+                                                {{ babi }} - {{ weight }} KG
+                                            </option>
+                                        {% endwith %}
+                                    {% endfor %}
                                 </select>
-                            </div>  
+                            </div>
+                            <div class="form-group">
+                                <label for="kapasitas">Total Berat dan Kapasitas Maksimum (KG)</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="number" class="form-control form-control-sm w-25" id="kapasitas" name="kapasitas_kandang" placeholder="Kapasitas Kandang" value="0" disabled>
+                                    <span class="text-muted small">/ 200 KG</span>
+                                </div>
+                                <small id="kapasitasHelp" class="form-text text-muted">Terhitung otomatis.</small>
+                            </div>
                             <div class="d-flex justify-content-end mt-3">
                                 <a href="{% url 'kandang' %}" class="btn btn-danger me-2">Kembali</a>
                                 <button type="submit" class="btn btn-success">Tambah</button>
@@ -51,8 +61,37 @@
         $('.select2').select2({
             placeholder: "Pilih babi...",
             allowClear: true,
-            maximumSelectionLength: 6  // ✅ Limit to 6 selections
         });
+
+        const maxWeight = 200;
+        const $babiSelect = $('#babi');
+        const $kapasitas = $('#kapasitas');
+
+        function updateKapasitasAndLimit() {
+            let total = 0;
+
+            $babiSelect.find('option:selected').each(function () {
+                total += parseFloat($(this).data('weight') || 0);
+            });
+
+            $kapasitas.val(total);
+
+            $babiSelect.find('option').each(function () {
+                const weight = parseFloat($(this).data('weight') || 0);
+                const isSelected = $(this).is(':selected');
+                if (!isSelected && (total + weight > maxWeight)) {
+                    $(this).prop('disabled', true);
+                } else {
+                    $(this).prop('disabled', false);
+                }
+            });
+
+            $babiSelect.trigger('change.select2');
+        }
+
+        $babiSelect.on('select2:select select2:unselect', updateKapasitasAndLimit);
+
+        updateKapasitasAndLimit();
     });
 </script>
 {% endblock script %}

@@ -63,7 +63,6 @@
         $('.select2').select2({
             placeholder: "Pilih babi...",
             allowClear: true,
-            maximumSelectionLength: 6  // ✅ Limit to 6 selections
         });
 
         const maxWeight = 200;
@@ -73,15 +72,12 @@
         function updateKapasitasAndLimit() {
             let total = 0;
 
-            // Calculate total berat from selected options
             $babiSelect.find('option:selected').each(function () {
                 total += parseFloat($(this).data('weight') || 0);
             });
 
-            // Update kapasitas input
             $kapasitas.val(total);
 
-            // Disable options that would exceed the max
             $babiSelect.find('option').each(function () {
                 const weight = parseFloat($(this).data('weight') || 0);
                 const isSelected = $(this).is(':selected');
@@ -92,14 +88,11 @@
                 }
             });
 
-            // Refresh Select2 to apply disabled states
             $babiSelect.trigger('change.select2');
         }
 
-        // Bind Select2 'select' and 'unselect' events
         $babiSelect.on('select2:select select2:unselect', updateKapasitasAndLimit);
 
-        // Initial trigger
         updateKapasitasAndLimit();
     });
 </script>

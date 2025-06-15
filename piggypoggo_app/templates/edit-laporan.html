@@ -8,46 +8,6 @@
             <hr>
         </div>
         <div class="row">
-            {% comment %}
-            <div class="col-md-12">
-                <a href="{% url 'babi' %}" class="btn btn-danger me-2" style="margin-top: -20px;">Kembali</a>
-                <hr>
-                <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="card-title" style="margin-right: 10px;">Edit Babi</div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="nama">Nama Babi</label>
-                                <input type="text" class="form-control" id="nama" name="nama_babi" placeholder="Nama Babi" value="{{ babi }}">
-                                <small id="namaHelp" class="form-text text-muted">Nama babi harus berbeda.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="nomor">Nomor Kandang</label>
-                                <select class="form-select select2" name="pk_kandang" id="pk_kandang" style="width: 100%;">
-                                    <option value="-">-</option>
-                                    {% for kandang in all_kandangs %}
-                                        {% if babi.kandang == kandang %}
-                                            <option value="{{ kandang.pk }}" selected>Kandang {{ kandang }}</option>
-                                        {% else %}
-                                            <option value="{{ kandang.pk }}">Kandang {{ kandang }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div> 
-
-                            <div class="d-flex justify-content-end mt-3">
-                                <button type="submit" name="submit_type" value="babi" class="btn btn-success">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {% endcomment %}
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
