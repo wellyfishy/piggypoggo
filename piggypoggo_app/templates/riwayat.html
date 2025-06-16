@@ -43,7 +43,7 @@
                         <tbody>
                             {% for riwayat in page_obj %}
                             <tr>
-                                <td>{{ riwayat }}</td>
+                                <td>{{ riwayat.user_profile.user.username }}: {{ riwayat }}</td>
                                 <td style="text-align: center;">{{ riwayat.tanggal|time }}</td>
                                 <td style="text-align: center;">{{ riwayat.tanggal|date:'d-m-Y' }}</td>
                             </tr>

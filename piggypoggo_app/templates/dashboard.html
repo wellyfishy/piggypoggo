@@ -101,7 +101,7 @@
               <li class="feed-item feed-item-secondary">
                 <time class="date" datetime="">{{ riwayat.tanggal }}</time>
                 <span class="text">
-                  {{ riwayat }}
+                  {{ riwayat.user_profile.user.username }}: {{ riwayat }}
                 </span>
               </li>
               {% endfor %}

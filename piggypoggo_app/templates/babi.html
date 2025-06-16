@@ -88,7 +88,7 @@
                             {% for babi in all_babis %}
                             <tr>
                                 <td style="text-align: center;">{{ forloop.counter }}</td>
-                                <td><b>{{ babi }}</b></td>
+                                <td><b>{{ babi }} ({{ babi.get_usia }})</b></td>
                                 <td style="text-align: center;">{% if babi.kandang %}Kandang {{ babi.kandang }}{% else %}<span style="color: red;">Tidak punya kandang</span>{% endif %}</td>
                                 <td style="text-align: center;">{{ babi.bb_bulan_ini }} KG</td>
                                 <td style="text-align: center;">{{ babi.bb_rata_rata }} KG</td>

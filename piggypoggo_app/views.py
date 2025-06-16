@@ -225,7 +225,8 @@ def tambahKandang(request):
             messages.error(request, f'Kandang dengan nomor "{nomor_kandang}" sudah ada!')
         else:
             kandang = Kandang.objects.create(nomor_kandang=nomor_kandang)
-            riwayat = Riwayat.objects.create(riwayat=f'Membuat kandang {kandang.nomor_kandang}')
+            user_profile = UserProfile.objects.filter(user=request.user).first()
+            riwayat = Riwayat.objects.create(riwayat=f'Membuat kandang {kandang.nomor_kandang}', user_profile=user_profile)
             selected_babis = list(map(int, request.POST.getlist('babi')))
             for babi in all_babis:
                 if babi.pk in selected_babis:
@@ -268,7 +269,8 @@ def editKandang(request, kandang_pk):
         kandang_validation = Kandang.objects.filter(nomor_kandang=nomor_kandang).first()
 
         if kandang == kandang_validation or not kandang_validation:
-            riwayat = Riwayat.objects.create(riwayat=f'Mengedit kandang {kandang.nomor_kandang} -> {nomor_kandang}')
+            user_profile = UserProfile.objects.filter(user=request.user).first()
+            riwayat = Riwayat.objects.create(riwayat=f'Mengedit kandang {kandang.nomor_kandang} -> {nomor_kandang}', user_profile=user_profile)
             for babi in all_babis:
                 if babi.pk in selected_babis:
                     babi.kandang = kandang
@@ -296,7 +298,8 @@ def editKandang(request, kandang_pk):
 @status_required([1, 2])
 def hapusKandang(request, kandang_pk):
     kandang = Kandang.objects.get(pk=kandang_pk)
-    new_riwayat = Riwayat.objects.create(riwayat=f'Menghapus kandang {kandang}')
+    user_profile = UserProfile.objects.filter(user=request.user).first()
+    new_riwayat = Riwayat.objects.create(riwayat=f'Menghapus kandang {kandang}', user_profile=user_profile)
     messages.success(request, f'Sukses menghapus kandang dengan nomor {kandang}')
     kandang.delete()
 
@@ -316,7 +319,8 @@ def babi(request):
             babi_pk = request.POST.get('babi_pk')
             alasan = request.POST.get('alasan')
             babi = Babi.objects.get(pk=babi_pk)
-            riwayat = Riwayat.objects.create(riwayat=f'Menghapus babi {babi.nama_babi}. Alasan: {alasan}')
+            user_profile = UserProfile.objects.filter(user=request.user).first()
+            riwayat = Riwayat.objects.create(riwayat=f'Menghapus babi {babi.nama_babi}. Alasan: {alasan}', user_profile=user_profile)
             messages.success(request, f'Sukses menghapus babi {babi.nama_babi}.')
             babi.delete()
             return redirect('babi')
@@ -449,7 +453,8 @@ def tambahBabi(request):
             babi.save()
 
             messages.success(request, f'Babi dengan nama "{babi.nama_babi}" berhasil di tambah!')
-            riwayat = Riwayat.objects.create(riwayat=f'Berhasil menambah babi {babi.nama_babi}')
+            user_profile = UserProfile.objects.filter(user=request.user).first()
+            riwayat = Riwayat.objects.create(riwayat=f'Berhasil menambah babi {babi.nama_babi}', user_profile=user_profile)
 
         return redirect('babi')
     context = {

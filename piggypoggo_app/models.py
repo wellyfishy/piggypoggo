@@ -53,12 +53,37 @@ class Babi(models.Model):
     def __str__(self):
         return f'{self.nama_babi}'
     
-    def get_umur(self):
-        return now - self.tanggal_lahir
+    def get_usia(self):
+        if self.tanggal_lahir is None:
+            return "Tanggal lahir tidak diketahui"
+        
+        today = date.today()
+        years_diff = today.year - self.tanggal_lahir.year
+        months_diff = today.month - self.tanggal_lahir.month
+        days_diff = today.day - self.tanggal_lahir.day
+        
+        usia_months = years_diff * 12 + months_diff
+        if days_diff < 0:
+            usia_months -= 1
+        
+        if usia_months < 0:
+            return "Tanggal lahir tidak valid"
+        
+        years = usia_months // 12
+        months = usia_months % 12
+        
+        if years > 0:
+            if months > 0:
+                return f"{years} tahun {months} bulan"
+            else:
+                return f"{years} tahun"
+        else:
+            return f"{months} bulan"
     
 class Riwayat(models.Model):
     riwayat = models.TextField(null=True, blank=True)
     tanggal = models.DateTimeField(auto_now_add=True)
+    user_profile = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.riwayat}'
