@@ -22,10 +22,6 @@
 
   </head>
   <body>
-    <audio id="songId" loop>
-      <source src="{% static 'merry-plushies-gang.mp3' %}" type="audio/mp3">
-      Browser anda tidak support audio.
-    </audio>
     <div class="wrapper">
       <div class="sidebar sidebar-style-2" data-background-color="dark">
         <div class="sidebar-logo">
@@ -186,15 +182,6 @@
     <script src="{% static 'js/piggypoggo.min.js' %}"></script>
     
     {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
-    <script>
-        var song = document.getElementById("songId");
-
-        document.addEventListener("click", function(event) {
-            if (event.button === 0) {
-              song.play();
-            }
-        });
-      </script>
     {% block script %}{% endblock script %}
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

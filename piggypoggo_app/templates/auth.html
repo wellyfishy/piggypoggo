@@ -13,11 +13,6 @@
 
   </head>
   <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <audio id="songId" loop>
-        <source src="{% static 'merry-plushies-gang.mp3' %}" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
-
     <div class="card" style="width: 60rem; display: flex; flex-direction: row;">
         <img src="{% static 'img/piggypoggo/jinhsi-sand.jpg' %}" class="card-img-left" alt="Image" style="width: 400px; height: 100%; object-fit: cover;">
         
@@ -53,14 +48,5 @@
     <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
     <script src="{% static 'js/piggypoggo.min.js' %}"></script>
-    <script>
-        var song = document.getElementById("songId");
-
-        document.addEventListener("click", function(event) {
-            if (event.button === 0) {
-                song.play();
-            }
-        });
-    </script>
   </body>
 </html>
