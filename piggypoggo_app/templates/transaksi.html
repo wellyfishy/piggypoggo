@@ -1,4 +1,4 @@
-{% extends "base-dashboard.html" %} {% load static %}
+{% extends "base-dashboard.html" %} {% load static %} {% load idr_format %}
 
 {% block style %}
 <style>
@@ -118,12 +118,17 @@
                         <form method="POST" class="d-flex align-items-center gap-3">
                             {% csrf_token %}
                             <div class="card-title mb-0">
-                                <strong class="print-visible" style="font-size: 15px;">Transaksi PiggyPoggo: {{ mulai }} - {{ hingga }}</strong><button type="button" onclick="window.print()" class="btn btn-success print-hide" style="font-size: 15px; padding: 5px 10px; margin-left: 5px;">Cetak <i class="fa fa-print"></i></button><br><hr>
+                                <strong class="print-visible" style="font-size: 15px;">Transaksi PiggyPoggo: <span id="mulai-dari">{{ mulai }}</span> - <span id="hingga-dari">{{ hingga }}</span></strong>
+                                {% comment %} <button type="button" onclick="window.print()" class="btn btn-success print-hide" style="font-size: 15px; padding: 5px 10px; margin-left: 5px;">Cetak <i class="fa fa-print"></i></button> {% endcomment %}
+                                {% comment %} <button type="button" onclick="printNotaFromDiv()" class="btn btn-success">Cetak Nota</button> {% endcomment %}
+                                <button type="button" onclick="printAllNotas()" class="btn btn-success">Cetak Semua Nota</button>
+                                <br>
+                                <hr>
                                 <div class="d-flex align-items-center gap-2 print-hide">
                                 <span class="print-hide">Filter:</span>
                                 <input type="date" class="form-control print-hide" name="mulai-dari">
                                 <span class="print-hide">-</span>
-                                <input type="date" class="form-control print-hide" name="hingga-dari">
+                                <input type="date" class="form-control print-hide" name="hingga-dari" >
                                 <button type="submit" class="btn btn-primary btn-sm print-hide">Terapkan</button>
                                 </div>
                             </div>
@@ -150,6 +155,7 @@
                             <th scope="col" style="text-align: center;">Kode</th>
                             <th scope="col" style="text-align: center;">Nama Pembeli</th>
                             <th scope="col" style="text-align: center;">Babi</th>
+                            <th scope="col" style="text-align: center;">Pengurangan</th>
                             <th scope="col" style="text-align: center;">Total</th>
                             <th scope="col" style="text-align: center;">Tanggal Nota</th>
                             <th scope="col" style="text-align: center;">Tanggal Diambil</th>
@@ -157,16 +163,72 @@
                         </thead>
                         <tbody>
                             {% for nota in all_notas %}
+                            <tr class="nota-row"
+                                data-kode="{{ nota.kode_nota }}"
+                                data-nama="{{ nota.nama_pembeli }}"
+                                data-tanggalnota="{{ nota.tanggal_nota }}"
+                                data-tanggal="{{ nota.tanggal_dibeli }}"
+                                data-alamat="{{ nota.alamat }}"
+                                data-pengiriman="{{ nota.pengiriman }}"
+                                data-pengurangan="{% if nota.pengurangan %}{{ nota.pengurangan|idr }}{% else %}0{% endif %}"
+                                data-total="{{ nota.total_harga|idr }}"
+                                data-babi="{% for dnota in nota.detail_nota.all %}{{ dnota.babi }}:Rp.{{ dnota.harga|idr }}{% if not forloop.last %}|{% endif %}{% endfor %}">
+                            </tr>
                             <tr>
-                                <td><a href="">{{ nota.kode_nota }}</td>
+                                <td>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#notaModal{{ nota.pk }}">
+                                        {{ nota.kode_nota }}
+                                    </a>
+                                </td>
+                                {% comment %} hide this {% endcomment %}
+                                <div class="modal fade" id="notaModal{{ nota.pk }}" tabindex="-1" aria-labelledby="notaModalLabel{{ nota.pk }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="notaModalLabel{{ nota.pk }}">Detail Nota: {{ nota.kode_nota }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="mb-1">Kode: <b>{{ nota.kode_nota }}</b></p>
+                                            <p class="mb-1">Pembeli: {{ nota.nama_pembeli }}</p>
+                                            <p class="mb-1">Tanggal Dibeli: {{ nota.tanggal_nota }}</p>
+                                            <p class="mb-1">Tanggal Diambil: {{ nota.tanggal_dibeli }}</p>
+                                            <p class="mb-1">Pengiriman: {{ nota.pengiriman }}</p>
+                                            <p class="mb-1">Alamat: {{ nota.alamat }}</p>
+                                            <p class="mb-1">Babi:
+                                                <ul>
+                                                    {% for detail_nota in nota.detail_nota.all %}
+                                                    <li>{{ detail_nota.babi }}: Rp. {{ detail_nota.harga|idr }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </p>
+                                            <p>Pengurangan: <span style="color: orange">Rp. {{ nota.total_harga_kasar|idr }}</span> - <span style="color: red">{% if nota.pengurangan %}{{ nota.pengurangan|idr }}{% else %}0{% endif %}</span></p>
+                                            <p class="mb-1">Total: <span style="color: green">Rp. {{ nota.total_harga|idr }}</span></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <td>{{ nota.nama_pembeli }}</td>
                                 <td style="text-align: center;">
-                                    {% for dnota in nota.detailnota_set.all %} 
+                                    {% for dnota in nota.detail_nota.all %} 
                                         {{ dnota.babi }}
                                         <br>
                                     {% endfor %}
                                 </td>
-                                <td style="text-align: center;"><b>Rp. {{ nota.formatted_total_harga }}</b></td>
+                                <td style="text-align: center;">
+                                    <b style="color: red">
+                                    Rp. -
+                                    {% if nota.pengurangan %}
+                                    {{ nota.pengurangan|idr }}
+                                    {% else %}
+                                    0
+                                    {% endif %}
+                                    </b>
+                                </td>
+                                <td style="text-align: center;"><b style="color: green">Rp. {{ nota.formatted_total_harga }}</b></td>
                                 <td style="text-align: center;">{{ nota.tanggal_nota|date:'d - m - Y' }} | {{ nota.tanggal_nota|time:'' }}</td>
                                 <td style="text-align: center;">{{ nota.tanggal_dibeli|date:'d - m - Y' }}</td>
                             </tr>
@@ -212,4 +274,120 @@
 {% endblock content %}
 
 {% block script %}
+<script>
+    function printAllNotas() {
+    const rows = document.querySelectorAll('.nota-row');
+    const now = new Date().toLocaleString('id-ID');
+    var mulaiDari = $('#mulai-dari').text()
+    var hinggaDari = $('#hingga-dari').text()
+
+    const notaHtmlList = Array.from(rows).map(row => {
+        const data = row.dataset;
+
+        const totalClean = parseInt(data.total.replace(/\D/g, '')) || 0;
+        const penguranganClean = parseInt(data.pengurangan.replace(/\D/g, '')) || 0;
+        const totalKasar = totalClean + penguranganClean;
+        const totalKasarFormatted = totalKasar.toLocaleString('id-ID');
+
+
+        const babiList = data.babi.split('|').map(item => {
+            const [name, price] = item.split(':');
+            return `<li>${name} - ${price}</li>`;
+        }).join('');
+
+        return `
+            <tr>
+                <td>${data.kode}</td>
+                <td>${data.nama}</td>
+                <td>${data.tanggalnota}</td>
+                <td>${data.tanggal}</td>
+                <td>${totalKasarFormatted} - ${data.pengurangan} = ${data.total}</td>
+                <td><ul>${babiList}</ul></td>
+            </tr>
+        `;
+    }).join('');
+
+    const html = `
+        <html>
+            <head>
+                <title>Semua Nota Transaksi PiggyPoggo</title>
+                <style>
+                    * {
+                        font-size: 15px;
+                    }
+                    body {
+                        font-family: 'Courier New', monospace;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    .nota-container {
+                        border: 1px dashed #333;
+                        padding: 10px;
+                        width: 100%;
+                        margin: 0 auto 40px auto;
+                        box-sizing: border-box;
+                    }
+                    h2 {
+                        text-align: center;
+                        margin: 20px 0;
+                    }
+                    .info, .items, .total {
+                        margin-bottom: 15px;
+                    }
+                    .items table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .items td {
+                        padding: 5px 0;
+                    }
+                    .items td:last-child {
+                        text-align: right;
+                    }
+                    .total {
+                        border-top: 1px dashed #333;
+                        padding-top: 10px;
+                        font-weight: bold;
+                        text-align: right;
+                    }
+                    .thanks {
+                        text-align: center;
+                        margin-top: 30px;
+                        font-style: italic;
+                    }
+                </style>
+            </head>
+            <body>
+                <body>
+                    <h2 style="text-align: center;">Nota Transaksi PiggyPoggo | ${mulaiDari} - ${hinggaDari}</h2>
+                    <div class="nota-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Tanggal</th>
+                                    <th>Tanggal Diambil</th>
+                                    <th>Harga</th>
+                                    <th>Babi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${notaHtmlList}
+                            </tbody>
+                        </table>
+                    </div>
+                </body>
+            </body>
+        </html>
+    `;
+
+    const printWin = window.open('', '', 'width=1280,height=720');
+    printWin.document.write(html);
+    printWin.document.close();
+    printWin.focus();
+    printWin.print();
+    printWin.close();
+}
+</script>
 {% endblock script %}

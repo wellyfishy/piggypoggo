@@ -538,6 +538,12 @@ def transaksi(request):
     pengingat = Nota.objects.filter(tanggal_dibeli__gte=today)
     mulai = 'Semua'
     hingga = 'Semua'
+    for nota in all_notas:
+        if nota.pengurangan:
+            nota.total_harga_kasar = int(nota.pengurangan) + int(nota.total_harga)
+        else:
+            if nota.total_harga:
+                nota.total_harga_kasar = int(nota.total_harga)
 
     if request.method == 'POST':
         mulai = request.POST.get('mulai-dari')  
@@ -578,11 +584,20 @@ def tambahTransaksi(request):
         nama_pembeli = request.POST.get('nama_pembeli')
         total_harga = request.POST.get('total_harga')
         total_harga = total_harga.replace('.', '')
+        pengurangan = request.POST.get('pengurangan_babi')
+        pengurangan = pengurangan.replace('.', '')
         total_harga = int(total_harga)
+        pengurangan = int(pengurangan)
         all_babis = request.POST.getlist('babi')
         tanggal_dibeli = request.POST.get('tanggal')
 
-        new_nota = Nota.objects.create(nama_pembeli=nama_pembeli, total_harga=total_harga, tanggal_nota=timezone.now())
+        pengiriman = request.POST.get('pengiriman')
+        alamat = request.POST.get('alamat')
+
+        if pengiriman == 'Ditempat':
+            alamat = 'Ditempat'
+
+        new_nota = Nota.objects.create(nama_pembeli=nama_pembeli, total_harga=total_harga, tanggal_nota=timezone.now(), pengurangan=pengurangan, pengiriman=pengiriman, alamat=alamat)
         new_nota.kode_nota = f'N{new_nota.pk}'
         
         if tanggal_dibeli:

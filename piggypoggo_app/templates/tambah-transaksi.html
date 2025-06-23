@@ -26,6 +26,17 @@
                                 <small id="tanggal" class="form-text text-muted">Masukan tanggal hari tersebut.</small>
                             </div>
                             <div class="form-group">
+                                <label for="tipe">Pengiriman</label>
+                                <select class="form-control" name="pengiriman" id="pengiriman">
+                                    <option value="Ditempat">Ditempat</option>
+                                    <option value="Dikirim">Dikirim</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="alamat-div" style="display: none">
+                                <label for="tipe">Alamat</label>
+                                <textarea class="form-control" name="alamat" id="alamat"></textarea>
+                            </div>
+                            <div class="form-group">
                                 <label for="babi">Pilih babi:</label>
                                 <select class="form-select select2" name="babi" id="babi" multiple="multiple" style="width: 100%;" required>
                                     {% for babi in all_babis %}
@@ -33,6 +44,10 @@
                                     {% endfor %}
                                 </select>
                             </div>  
+                            <div class="form-group">
+                                <label for="harga">Pengurangan</label>
+                                <input type="text" class="form-control" id="pengurangan" name="pengurangan_babi" placeholder="0" value="0" required>
+                            </div>
                             <div class="form-group">
                                 <label for="total_harga">Total Harga</label>
                                 <input type="text" class="form-control" id="total_harga" name="total_harga" placeholder="Total harga..." value="" readonly>
@@ -60,27 +75,64 @@
           allowClear: true
         });
 
+        let currentTotal = 0;
+
+        $('#pengiriman').on('change', function() {
+            let val = $(this).val();
+            if (val == 'Ditempat') {
+                $('#alamat-div').css('display', 'none')
+            } else if (val == 'Dikirim') {
+                $('#alamat-div').css('display', '')
+            }
+        })
         
         $('#babi').on('change', function () {
-            let total = 0;
+            currentTotal = 0;
             $(this).find('option:selected').each(function () {
                 const text = $(this).text();
                 const match = text.match(/Rp\.?\s?([\d\.]+)/);
                 if (match) {
-                    const number = parseInt(match[1].replace(/\./g, '')); 
-                    total += number;
+                    const number = parseInt(match[1].replace(/\./g, ''));
+                    currentTotal += number;
                 }
             });
 
-            $('#total_harga').val(total.toLocaleString('id-ID'));
+            updateTotalHarga();
         });
+
+        document.getElementById('pengurangan').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); 
+            pengurangan = value
+            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); 
+            e.target.value = formatted;
+
+            updateTotalHarga();
+        });
+
+        function updateTotalHarga() {
+            let penguranganStr = $('#pengurangan').val().replace(/\./g, '') || '0';
+            let pengurangan = parseInt(penguranganStr);
+            let finalTotal = currentTotal - pengurangan;
+
+            $('#total_harga').val(finalTotal.toLocaleString('id-ID'));
+        }
 
         document.querySelector("form").addEventListener("submit", function(e) {
             e.preventDefault();
 
+            const now = new Date();
+            const formatted = `~ ${now.toLocaleString('id-ID')} ~`;
+
             const nama = document.getElementById("nama_pembeli").value;
             const tanggal = document.getElementById("tanggal").value;
             const total = document.getElementById("total_harga").value;
+            const pengurangan = document.getElementById("pengurangan").value;
+
+            const pengiriman = document.getElementById("pengiriman").value;
+            var alamat = 'Ditempat'
+            if (pengiriman == 'Dikirim') {
+                alamat = document.getElementById("alamat").value;
+            }
 
             const babiSelect = document.getElementById("babi");
             const selectedOptions = Array.from(babiSelect.selectedOptions);
@@ -137,16 +189,22 @@
                         <h2>Nota Transaksi</h2>
                         <div class="info">
                             <p><strong>Nama:</strong> ${nama}</p>
-                            <p><strong>Tanggal:</strong> ${tanggal}</p>
+                            <p><strong>Tanggal Diambil:</strong> ${tanggal}</p>
+                            <p><strong>Pengiriman:</strong> ${pengiriman}</p>
+                            <p><strong>Alamat:</strong> ${alamat}</p>
                         </div>
                         <div class="items">
                             <table>
                                 ${babiList.map(item => `
                                     <tr>
                                         <td>${item.split(' - ')[0]}</td>
-                                        <td>Rp. ${item.split(' - ')[1]}</td>
+                                        <td>${item.split(' - ')[1]}</td>
                                     </tr>
                                 `).join('')}
+                                <tr>
+                                    <td>Pengurangan</td>
+                                    <td>Rp. ${pengurangan}</td>
+                                </tr>
                             </table>
                         </div>
                         <div class="total">
@@ -154,6 +212,7 @@
                         </div>
                         <div class="thanks">
                             ~ Terima kasih telah berbelanja ~
+                            ~ ${formatted} ~
                         </div>
                     </div>
                 </body>

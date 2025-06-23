@@ -126,11 +126,18 @@ class ToDo(models.Model):
         return 'Tidak diketahui'
     
 class Nota(models.Model):
+    PENGIRIMAN = [
+        ('Dikirim', 'Dikirim'),
+        ('Ditempat', 'Ditempat'),
+    ]
     kode_nota = models.CharField(unique=True, blank=True, null=True, max_length=10)
     nama_pembeli = models.CharField(max_length=50, null=True, blank=True)
+    pengurangan = models.IntegerField(null=True, blank=True)
     total_harga = models.IntegerField(null=True, blank=True)
     tanggal_nota = models.DateTimeField(null=True, blank=True)
     tanggal_dibeli = models.DateField(null=True, blank=True)
+    pengiriman = models.CharField(choices=PENGIRIMAN, default='Ditempat')
+    alamat = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.pk}'
@@ -138,7 +145,7 @@ class Nota(models.Model):
 class DetailNota(models.Model):
     babi = models.ForeignKey(Babi, null=True, blank=True, on_delete=models.SET_NULL)
     harga = models.IntegerField(null=True, blank=True)
-    nota = models.ForeignKey(Nota, null=True, blank=True, on_delete=models.CASCADE)
+    nota = models.ForeignKey(Nota, null=True, blank=True, on_delete=models.CASCADE, related_name="detail_nota")
 
     def __str__(self):
         return f'{self.babi} - {self.nota}'
