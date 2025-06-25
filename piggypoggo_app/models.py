@@ -136,7 +136,7 @@ class Nota(models.Model):
     total_harga = models.IntegerField(null=True, blank=True)
     tanggal_nota = models.DateTimeField(null=True, blank=True)
     tanggal_dibeli = models.DateField(null=True, blank=True)
-    pengiriman = models.CharField(choices=PENGIRIMAN, default='Ditempat')
+    pengiriman = models.CharField(choices=PENGIRIMAN, default='Ditempat', max_length=10)
     alamat = models.TextField(null=True, blank=True)
 
     def __str__(self):
